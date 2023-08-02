@@ -1,34 +1,17 @@
 <script setup lang="ts">
-import GameHeader from './components/GameHeader.vue'
+import { ref, watch } from 'vue'
 import GameFigure from './components/GameFigure.vue'
-import GameWrongLetter from './components/GameWrongLetter.vue'
-import GameWord from './components/GameWord.vue'
-import GamePopup from './components/GamePopup.vue'
+import GameHeader from './components/GameHeader.vue'
 import GameNotification from './components/GameNotification.vue'
-import axios from 'axios'
-import { computed, ref, watch } from 'vue'
+import GamePopup from './components/GamePopup.vue'
+import GameWord from './components/GameWord.vue'
+import GameWrongLetter from './components/GameWrongLetter.vue'
+import { useLetters } from './composables/useLetters'
+import { useRandomWord } from './composables/useRandomWord'
 
-const word = ref('')
+const { word, getRandomWord } = useRandomWord()
+const { letters, correctLetters, wrongLetters, isStatusLose, isStatusWin } = useLetters(word)
 
-const getRandomWord = async () => {
-  try {
-    const { data } = await axios<{ FirstName: string }>(
-      'https://api.randomdatatools.ru/?unescaped=false&params=FirstName'
-    )
-    word.value = data.FirstName.toLowerCase()
-  } catch (error) {
-    console.log(error)
-    word.value = ''
-  }
-}
-
-getRandomWord()
-
-const letters = ref<string[]>([])
-const correctLetters = computed(() => letters.value.filter((el) => word.value.includes(el)))
-const wrongLetters = computed(() => letters.value.filter((el) => !word.value.includes(el)))
-const isStatusLose = computed(() => wrongLetters.value.length === 6)
-const isStatusWin = computed(() => [...word.value].every((el) => correctLetters.value.includes(el)))
 const notification = ref<InstanceType<typeof GameNotification> | null>(null)
 const popup = ref<InstanceType<typeof GamePopup> | null>(null)
 
@@ -61,8 +44,8 @@ window.addEventListener('keydown', ({ key }) => {
 })
 
 const restart = async () => {
-  await getRandomWord()
   letters.value = []
+  await getRandomWord()
   popup.value?.closePopup()
 }
 </script>
