@@ -105,6 +105,10 @@ h1 {
   color: #fff;
 }
 
+.popup h3 span::first-letter {
+  text-transform: capitalize;
+}
+
 .popup button {
   cursor: pointer;
   background-color: #fff;
