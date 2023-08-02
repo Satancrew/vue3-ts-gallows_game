@@ -47,6 +47,7 @@ h1 {
   position: absolute;
   top: 20px;
   right: 20px;
+  width: 130px;
   display: flex;
   flex-direction: column;
   text-align: right;
