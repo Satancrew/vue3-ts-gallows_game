@@ -7,12 +7,27 @@ import GamePopup from './components/GamePopup.vue'
 import GameWord from './components/GameWord.vue'
 import GameWrongLetter from './components/GameWrongLetter.vue'
 import { useLetters } from './composables/useLetters'
+import { useNotification } from './composables/useNotification'
 import { useRandomWord } from './composables/useRandomWord'
 
 const { word, getRandomWord } = useRandomWord()
-const { letters, correctLetters, wrongLetters, isStatusLose, isStatusWin } = useLetters(word)
+const {
+  letters,
+  correctLetters,
+  wrongLetters,
+  isStatusLose,
+  isStatusWin,
+  addLetter,
+  resetLetters
+} = useLetters(word)
+const { notification, showNotification } = useNotification()
 
-const notification = ref<InstanceType<typeof GameNotification> | null>(null)
+const restart = async () => {
+  await getRandomWord()
+  resetLetters()
+  popup.value?.closePopup()
+}
+
 const popup = ref<InstanceType<typeof GamePopup> | null>(null)
 
 watch(wrongLetters, () => {
@@ -33,21 +48,12 @@ window.addEventListener('keydown', ({ key }) => {
   }
 
   if (letters.value.includes(key)) {
-    notification.value?.openPopup()
-    setTimeout(() => notification.value?.closePopup(), 1500)
+    showNotification()
     return
   }
 
-  if (/[а-яА-ЯёЁ]/.test(key)) {
-    letters.value.push(key.toLowerCase())
-  }
+  addLetter(key)
 })
-
-const restart = async () => {
-  letters.value = []
-  await getRandomWord()
-  popup.value?.closePopup()
-}
 </script>
 
 <template>
@@ -60,3 +66,4 @@ const restart = async () => {
   <GamePopup ref="popup" :word="word" @restart="restart" />
   <GameNotification ref="notification" />
 </template>
+./composables/useNotification
